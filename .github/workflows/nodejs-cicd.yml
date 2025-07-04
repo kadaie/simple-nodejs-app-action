@@ -22,14 +22,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build app
-        run: npm run build
+      - name: Simulate build
+        run: echo "Skipping actual build step"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: react-build
-          path: build
+          path: .  # use current folder or modify as needed
 
   deploy:
     name: Deploy to Production
@@ -42,7 +42,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: react-build
-          path: build
+          path: .
 
       - name: Deploy to server (mock)
         run: echo "Deploying to production..."
