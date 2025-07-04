@@ -1,44 +1,46 @@
 name: Node.js CI/CD
 
 on:
-    workflow_dispatch:
-    push:
-        branches:
-            - master
-    pull_request:
-        branches:
-            - master
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
 jobs:
-    build-and-test:
-        runs-on: ubuntu:latest
-        steps:
-            - name: checkout the code 
-              uses: actions/checkout@v4
-            
-            - name: Set Up Nodejs
-              uses: actions/setup-node@v4
-            
-            - name: Install dependencies 
-              run: npm install 
-            
-            - name: Run Linter 
-              run: npm run lint
-              continue-on-error: true
-            
-            - name: Run Test 
-              run: npm run test 
-    
-    deploy: 
-        needs: build-and-test
-        runs-on: ubuntu:latest
-        if: github.ref == 'refs/heads/master'
-        environment: 
-            name: production
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code 
+        uses: actions/checkout@v4
+      
+      - name: Set Up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies 
+        run: npm install 
+      
+      - name: Run Linter 
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Run Test 
+        run: npm run test 
 
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+  deploy: 
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    environment:
+      name: production  
 
-            - name: Deploy to production
-              run: echo "Deployment Completed"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
+      - name: Deploy to production
+        run: echo "Deployment Completed"
