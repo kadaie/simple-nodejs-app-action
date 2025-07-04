@@ -1,46 +1,48 @@
-name: Node.js CI/CD
+name: React CI/CD with Approval
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  build:
+    name: Build React App
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the code 
+      - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Set Up Node.js
+
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
-      - name: Install dependencies 
-        run: npm install 
-      
-      - name: Run Linter 
-        run: npm run lint
-        continue-on-error: true
-      
-      - name: Run Test 
-        run: npm run test 
 
-  deploy: 
-    needs: build-and-test
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: react-build
+          path: build
+
+  deploy:
+    name: Deploy to Production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    needs: build
     environment:
-      name: production  
-
+      name: production
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: react-build
+          path: build
 
-      - name: Deploy to production
-        run: echo "Deployment Completed"
+      - name: Deploy to server (mock)
+        run: echo "Deploying to production..."
